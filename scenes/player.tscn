@@ -1,0 +1,42 @@
+[gd_scene load_steps=7 format=3 uid="uid://b430gx07ngsk2"]
+
+[ext_resource type="Script" path="res://scenes/player.cs" id="1_l7s37"]
+[ext_resource type="Shader" path="res://resources/pixel.gdshader" id="2_o4luc"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_q3nxk"]
+height = 2.5
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_yg1ij"]
+points = PackedVector3Array(0.442345, 0.929704, 0.144677, -0.482881, -0.847055, -0.0775678, -0.4433, -0.878462, -0.186914, 0.368455, -1.0052, 0.219448, -0.224021, 0.843477, 0.436137, 0.0697525, 0.848449, -0.483669, 0.324375, -0.83916, -0.368908, -0.413476, 1.00479, -0.115583, -0.114496, -0.847682, 0.475299, 0.177034, 0.724351, 0.467026, -0.186915, -0.878466, -0.443301, -0.156075, -1.21769, -0.0800219, 0.471614, 0.804503, -0.150144, 0.148588, 1.22129, 0.0723101, -0.441745, -0.839014, 0.21492, -0.292173, 0.792588, -0.400411, -0.477947, 0.765479, 0.141714, 0.473793, -0.808189, 0.142877, 0.3536, -0.714927, 0.3536, 0.108988, 1.1299, -0.305248, 0.441025, -0.926955, -0.152174, 0.0697521, -0.848445, -0.483667, 0.28668, 0.799308, -0.403772, -0.476972, 0.727443, -0.149351, 0.146497, -1.16704, -0.229857, -0.0801905, -1.22039, 0.148476, -0.11728, 1.13346, 0.298261, 0.106856, -0.849957, 0.476586, 0.397718, 0.83967, 0.288049, -0.19221, 1.16774, -0.19221, -0.332568, -0.839815, 0.361256, 0.144601, 1.00353, 0.405024)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_j58ma"]
+render_priority = 0
+shader = ExtResource("2_o4luc")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_oysqa"]
+material = SubResource("ShaderMaterial_j58ma")
+size = Vector2(10, 10)
+
+[node name="player" type="RigidBody3D"]
+lock_rotation = true
+script = ExtResource("1_l7s37")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_q3nxk")
+skeleton = NodePath("")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("ConvexPolygonShape3D_yg1ij")
+
+[node name="twistPivot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.3, 0)
+
+[node name="pitchPivot" type="Node3D" parent="twistPivot"]
+transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 0, 0)
+
+[node name="Camera3D" type="Camera3D" parent="twistPivot/pitchPivot"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="twistPivot/pitchPivot/Camera3D"]
+transform = Transform3D(1, 0, 0, 0, -2.98023e-08, -1, 0, 1, -2.98023e-08, 0, 0.517638, -1.93185)
+mesh = SubResource("PlaneMesh_oysqa")
