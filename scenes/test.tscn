@@ -1,8 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://bw3dqdo1du0jm"]
+[gd_scene load_steps=15 format=3 uid="uid://bw3dqdo1du0jm"]
 
 [ext_resource type="Texture2D" uid="uid://c2luohdyx86kw" path="res://assets/hdris/kloofendal_48d_partly_cloudy_puresky_2k.hdr" id="1_akvs5"]
-[ext_resource type="Texture2D" uid="uid://b57325kegmhtt" path="res://assets/Orange/texture_01.png" id="2_v7iyh"]
-[ext_resource type="PackedScene" uid="uid://b430gx07ngsk2" path="res://scenes/player.tscn" id="3_awsoy"]
+[ext_resource type="Texture2D" uid="uid://c15xjrxj333qq" path="res://assets/Dark/texture_01.png" id="2_qyuj4"]
+[ext_resource type="Script" path="res://scripts/player.cs" id="3_b7dl1"]
+[ext_resource type="Shader" path="res://resources/pixel.gdshader" id="4_2qrd4"]
+[ext_resource type="Script" path="res://scripts/inventory.cs" id="5_tnq5r"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_cwncm"]
 panorama = ExtResource("1_akvs5")
@@ -17,8 +19,25 @@ tonemap_mode = 2
 glow_enabled = true
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_puw64"]
-albedo_texture = ExtResource("2_v7iyh")
+albedo_texture = ExtResource("2_qyuj4")
 uv1_triplanar = true
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_416hu"]
+height = 2.5
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_2hjl1"]
+points = PackedVector3Array(0.442345, 0.929704, 0.144677, -0.482881, -0.847055, -0.0775678, -0.4433, -0.878462, -0.186914, 0.368455, -1.0052, 0.219448, -0.224021, 0.843477, 0.436137, 0.0697525, 0.848449, -0.483669, 0.324375, -0.83916, -0.368908, -0.413476, 1.00479, -0.115583, -0.114496, -0.847682, 0.475299, 0.177034, 0.724351, 0.467026, -0.186915, -0.878466, -0.443301, -0.156075, -1.21769, -0.0800219, 0.471614, 0.804503, -0.150144, 0.148588, 1.22129, 0.0723101, -0.441745, -0.839014, 0.21492, -0.292173, 0.792588, -0.400411, -0.477947, 0.765479, 0.141714, 0.473793, -0.808189, 0.142877, 0.3536, -0.714927, 0.3536, 0.108988, 1.1299, -0.305248, 0.441025, -0.926955, -0.152174, 0.0697521, -0.848445, -0.483667, 0.28668, 0.799308, -0.403772, -0.476972, 0.727443, -0.149351, 0.146497, -1.16704, -0.229857, -0.0801905, -1.22039, 0.148476, -0.11728, 1.13346, 0.298261, 0.106856, -0.849957, 0.476586, 0.397718, 0.83967, 0.288049, -0.19221, 1.16774, -0.19221, -0.332568, -0.839815, 0.361256, 0.144601, 1.00353, 0.405024)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_iwt1s"]
+render_priority = 0
+shader = ExtResource("4_2qrd4")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_nsskn"]
+material = SubResource("ShaderMaterial_iwt1s")
+size = Vector2(10, 10)
+
+[sub_resource type="LabelSettings" id="LabelSettings_5yqgd"]
+font_size = 50
 
 [node name="main" type="Node3D"]
 
@@ -37,10 +56,72 @@ shadow_enabled = true
 use_collision = true
 
 [node name="CSGBox3D" type="CSGBox3D" parent="world/CSGCombiner3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -7.5)
-size = Vector3(9, 1, 20)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, -0.5, -20)
+size = Vector3(25, 1, 45)
 material = SubResource("StandardMaterial3D_puw64")
 
-[node name="player" parent="world" instance=ExtResource("3_awsoy")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.31432, 0)
-top_level = true
+[node name="player" type="CharacterBody3D" parent="world"]
+transform = Transform3D(0.999027, 0, -0.0438959, 0, 1, 0, 0.0438959, 0, 0.999027, 0, 1.3, 0)
+script = ExtResource("3_b7dl1")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="world/player"]
+mesh = SubResource("CapsuleMesh_416hu")
+skeleton = NodePath("")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="world/player"]
+shape = SubResource("ConvexPolygonShape3D_2hjl1")
+
+[node name="head" type="Node3D" parent="world/player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="Camera3D" type="Camera3D" parent="world/player/head"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.00540805, -0.0607679)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="world/player/head/Camera3D"]
+transform = Transform3D(1, 0, 0, 0, -2.98023e-08, -1, 0, 1, -2.98023e-08, 0, 0.517638, -0.93185)
+mesh = SubResource("PlaneMesh_nsskn")
+
+[node name="inventory" type="Control" parent="world/player"]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("5_tnq5r")
+
+[node name="Panel" type="Panel" parent="world/player/inventory"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -900.0
+offset_top = -100.0
+offset_right = 900.0
+offset_bottom = 500.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="world/player/inventory/Panel"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -11.5
+offset_right = 20.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Inventory"
+label_settings = SubResource("LabelSettings_5yqgd")
